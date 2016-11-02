@@ -1,22 +1,44 @@
 var fs = require('fs');
 var http = require('http');
 var url = require('url');
+var firstName = "Visitor";
+var lastName = '';
 var ROOT_DIR = "html/";
+const Emitter = require('events');
+var emtr = new Emitter();
 
 http.createServer(function (req, res) {
     var urlObj = url.parse(req.url, true, false);
-    fs.readFile(ROOT_DIR + urlObj.pathname, function (err, data) {
-        if (err) {
-            res.writeHead(404);
-            res.end(JSON.stringify(err));
-            return;
-        } else {
-            res.writeHead(200); //ok
-            res.end(data);
-        }
-    });
-    /*
-    res.writeHead(200, { 'Content-type': 'text/plain' });
-    res.end('Hello, World!\n');*/
+    console.log(urlObj);
+    var cookie = req.headers["set-cookie"];
+    if (setcookie) {
+        firstName = cookie.name;
+    } else {
+        console.log("no cookie found");
+    }
+    if (urlObj.pathname === '/' || urlObj.pathname === '/index.html') {
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        var html = getWebpage('index');
+    } else if (urlObj.pathname === 'login') {
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        var html = getWebpage('login');
+    }
+    html = html.replace('{name}', firstName);
+    res.end(html);
 
-}).listen(8000, '127.0.0.1');
+}).listen(3000, '127.0.0.1');
+
+function getWebpage(siteName) {
+    var webpage = fs.readFileSync(ROOT_DIR + 'header.html', 'utf8');
+    webpage += fs.readFileSync(ROOT_DIR + siteName + '.html', 'utf8');
+    webpage += fs.readFileSync(ROOT_DIR + 'footer.html', 'utf8');
+    return webpage;
+}
+/*
+var headers = {
+    'Host': 'www.example.com',
+    'Cookie': cookie,
+    'Content-Type': 'application/json',
+    'Content-Length': Buffer.byteLength(data, 'utf8')
+};
+*/
