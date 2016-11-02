@@ -11,18 +11,22 @@ http.createServer(function (req, res) {
     var urlObj = url.parse(req.url, true, false);
     console.log(urlObj);
     var cookie = req.headers["set-cookie"];
-    if (setcookie) {
+    var html = '{name}';
+
+    if (cookie) {
         firstName = cookie.name;
     } else {
         console.log("no cookie found");
     }
+
     if (urlObj.pathname === '/' || urlObj.pathname === '/index.html') {
         res.writeHead(200, { 'Content-Type': 'text/html' });
-        var html = getWebpage('index');
-    } else if (urlObj.pathname === 'login') {
+        html = getWebpage('index');
+    } else if (urlObj.pathname === '/login.html') {
         res.writeHead(200, { 'Content-Type': 'text/html' });
-        var html = getWebpage('login');
+        html = getWebpage('login');
     }
+
     html = html.replace('{name}', firstName);
     res.end(html);
 
